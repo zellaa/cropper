@@ -1,7 +1,9 @@
 #!/bin/sh
-#Requires whiptail, datediff, & ffmpeg
+for f in *; do
+	newfilename="$(echo "$f" | tr ' ' '_')"
+	mv "$f" "$newfilename"
+done
 
-nospace
 W=() 
 for x in $(find -maxdepth 1 -iregex ".*\.\(mkv\|opus\|mp4\|m4a\|avi\|webm\)" -printf '%f\n'); do
     W+=("$x" "")
