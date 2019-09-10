@@ -1,4 +1,4 @@
-# Maintainer: Mirza Baig <mirzabaig@protonmail.com>
+#Maintainer: Mirza Baig <mirzabaig@protonmail.com>
 pkgname=cropper
 pkgver=1.0
 pkgrel=1
