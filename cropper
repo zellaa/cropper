@@ -1,15 +1,47 @@
 #!/bin/sh
-desired=$(find . -maxdepth 1 -iregex ".*\.\(mkv\|opus\|mp4\|m4a\|avi\|webm\)" -printf '%f\n')
+
+function display_help () {
+cat <<-END
+Usage:
+------
+cropper [optional arguments]
+------
+Optional arguments:
+------
+-h) Display help message 
+-l) List file types to search for
+------
+Cropper is a tool to trim video and audio files. It does this by first removing all filespaces within any files in the working directory, provided it contains any of the desired filetypes, and then prompting the user with options for timings and 2 basic styles of crops.
+
+Quick crops do not re-encode - and thus crop from the nearest keyframe. This may lead to your crop timings being a few seconds off on each 'end'; besides time saving this method also preserves the quality of video. Accurate crops re-encode, and as such may lead to a loss of quality. You can fiddle around with the settings in the source file (there is a link on the github page for this project for help on doing so).
+
+It is possible to append filetype extensions to the "filetypes_list" variable within the source file, in the style present (i.e. space-seperated and quoted). Cropper utilises ffmpeg to do the actual cropping, so any ffmpeg-supported filetype will work.
+END
+}
+
+filetypes_list=("mkv" "mov" "mp4" "m4a" "avi" "webm")
+
+filetypes=$(echo "${filetypes_list[@]}" | sed 's/ /\\|/g')
+desired=$(find . -maxdepth 1 -iregex ".*\.\($filetypes\)" -printf '%f\n')
+
+function lister () {
+	readable_list=$(echo $filetypes | sed -e 's/\\//g' -e 's/|/ /g')
+	echo "$readable_list"
+}
+
+function cropper () {
 if [ "$(echo $desired | wc -c)" == 1 ]; then
-	echo "No video or audio files found in current directory."
+	echo "No video or audio files found in current directory. Run cropper -h to view help."
 	exit
 else
 	for f in *; do
 		newfilename="$(echo "$f" | tr ' ' '_')"
 		mv "$f" "$newfilename"
 	done
+	ls
+	desired_nospace=$(find . -maxdepth 1 -iregex ".*\.\($filetypes\)" -printf '%f\n')
 	W=() 
-	for x in $desired; do
+	for x in $desired_nospace; do
 		W+=("$x" "")
 	done
 	FILE=$(whiptail --title "List of video files in current directory:" --menu "Choose one" 24 80 17 "${W[@]}" 3>&2 2>&1 1>&3) 
@@ -33,4 +65,18 @@ else
 						ffmpeg -ss "$time1" -i "$FILE" -t "$duration" -preset veryslow -async 1 "$outfile"
 				esac
 	esac
+fi
+}
+
+if [ $# -eq 0 ]; then
+	cropper
+else
+	while getopts ":hl" arg; do
+		case $arg in
+			h) 
+				display_help;;
+			l) 
+				lister;;
+		esac
+	done
 fi
