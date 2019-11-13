@@ -6,6 +6,8 @@ Run cropper normally by entering `cropper` within a terminal, or pass any option
 * `-h` to show help within the terminal
 * `-l` to list file extensions which cropper is looking for
 
+Time stamps should be entered in the format HH:MM:SS (e.g 02:00:21 would be a time stamp at 2 hours and 21 seconds). 
+
 ## Notes:
 * Cropper renames all files within the current directory which have spaces by replacing the spaces with underlines. For example, `file name.mkv` becomes `file_name.mkv`.
 
